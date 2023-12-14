@@ -6,7 +6,8 @@ import numpy as np
 data = {
     'Loan_ID': ['Loan1', 'Loan2', 'Loan3', 'Loan4', 'Loan5'],
     'Balance': [100000, 150000, 200000, 250000, 300000],
-    'Current_Default_Rate': [0.01, 0.02, 0.015, 0.03, 0.04]
+    'PD': [0.01, 0.02, 0.015, 0.03, 0.04],
+    'LGD':[0.1, 0.1, 0.1, 0.2, 0.3]
 }
 loans = pd.DataFrame(data)
 
@@ -21,7 +22,7 @@ stress_scenarios = {
 # 压力测试函数
 def stress_test(loans, scenario):
     # 对每笔贷款应用压力情景
-    loans['Stressed_Default_Rate'] = loans['Current_Default_Rate'] * stress_scenarios[scenario]
+    loans['Stressed_Default_Rate'] = loans['PD'] * stress_scenarios[scenario] * loans['LGD']
     loans['Stressed_Loss'] = loans['Balance'] * loans['Stressed_Default_Rate']
     
     # 计算总体损失
