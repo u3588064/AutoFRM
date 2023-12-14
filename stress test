@@ -1,0 +1,34 @@
+import pandas as pd
+import numpy as np
+
+# 示例数据：贷款组合
+# 假设有一个简单的贷款组合数据集，包含贷款余额和当前违约率
+data = {
+    'Loan_ID': ['Loan1', 'Loan2', 'Loan3', 'Loan4', 'Loan5'],
+    'Balance': [100000, 150000, 200000, 250000, 300000],
+    'Current_Default_Rate': [0.01, 0.02, 0.015, 0.03, 0.04]
+}
+loans = pd.DataFrame(data)
+
+# 压力测试参数
+# 假设在不同经济情景下违约率的增加
+stress_scenarios = {
+    'Mild': 1.2,  # 轻微情景下违约率增加20%
+    'Moderate': 1.5,  # 中等情景下增加50%
+    'Severe': 2.0  # 严重情景下增加100%
+}
+
+# 压力测试函数
+def stress_test(loans, scenario):
+    # 对每笔贷款应用压力情景
+    loans['Stressed_Default_Rate'] = loans['Current_Default_Rate'] * stress_scenarios[scenario]
+    loans['Stressed_Loss'] = loans['Balance'] * loans['Stressed_Default_Rate']
+    
+    # 计算总体损失
+    total_stressed_loss = loans['Stressed_Loss'].sum()
+    return total_stressed_loss
+
+# 执行压力测试
+for scenario in stress_scenarios:
+    loss = stress_test(loans.copy(), scenario)
+    print(f"Total loss under {scenario} scenario: {loss}")
