@@ -1,0 +1,78 @@
+Sub GenerateLiquidityReportWithMonthlyTotals()
+    Dim wsSource As Worksheet, wsReport As Worksheet
+    Dim rngData As Range, cell As Range
+    Dim dict As Object, key As Variant, dateKey As Variant
+    Dim subj As String, rDate As Date, amt As Double
+    Dim i As Long, j As Long, monthlyTotals As Object
+    Dim startDate As Date, endDate As Date
+
+    Set wsSource = ThisWorkbook.Sheets("日历账") ' 你的日历账工作表名称
+    Set wsReport = ThisWorkbook.Sheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count))
+    wsReport.Name = "日间流动性报表"
+    Set dict = CreateObject("Scripting.Dictionary")
+    Set monthlyTotals = CreateObject("Scripting.Dictionary")
+
+    ' 读取数据并填充字典
+    Set rngData = wsSource.Range("A2:D" & wsSource.Cells(Rows.Count, "A").End(xlUp).Row)
+    For Each cell In rngData.Columns(1).Cells
+        subj = cell.Offset(0, 1).Value
+        rDate = cell.Value
+        amt = cell.Offset(0, 3).Value
+        If Not dict.exists(subj) Then
+            Set dict(subj) = CreateObject("Scripting.Dictionary")
+        End If
+        If Not dict(subj).exists(rDate) Then
+            dict(subj)(rDate) = amt
+        Else
+            dict(subj)(rDate) = dict(subj)(rDate) + amt
+        End If
+        
+        ' 更新月度总计
+        Dim monthKey As String
+        monthKey = Format(rDate, "yyyy-mm")
+        If Not monthlyTotals.exists(subj) Then
+            Set monthlyTotals(subj) = CreateObject("Scripting.Dictionary")
+        End If
+        If Not monthlyTotals(subj).exists(monthKey) Then
+            monthlyTotals(subj)(monthKey) = amt
+        Else
+            monthlyTotals(subj)(monthKey) = monthlyTotals(subj)(monthKey) + amt
+        End If
+    Next cell
+
+    ' 对日期进行排序
+    Dim allDates As Collection, sortedDates As Collection
+    Set allDates = New Collection
+    For Each dateKey In dict(subj).keys
+        allDates.Add dateKey
+    Next dateKey
+    Set sortedDates = SortDates(allDates)
+
+    ' 使用排序后的日期填充报表
+    ' ... 插入之前的代码逻辑 ...
+    ' 注意：这里需要调整代码来使用sortedDates集合
+
+    ' 填充月度总计
+    ' ... 插入代码以在报表的右侧添加月度总计 ...
+
+End Sub
+
+Function SortDates(dates As Collection) As Collection
+    Dim i As Long, j As Long
+    Dim temp As Variant
+
+    Set SortDates = New Collection
+    For Each temp In dates
+        SortDates.Add temp
+    Next temp
+
+    For i = 1 To SortDates.Count - 1
+        For j = i + 1 To SortDates.Count
+            If SortDates(i) > SortDates(j) Then
+                temp = SortDates(i)
+                SortDates.Remove i
+                SortDates.Add temp, Before:=j
+            End If
+        Next j
+    Next i
+End Function
