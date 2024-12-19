@@ -7,6 +7,9 @@ An open-source risk management system for small and medium-sized institutions th
 文书审核
 
 A业务自动化
+
 B业务自动化
+
 财务报表分析自动化[https://github.com/u3588064/AutoFSA]
+
 尽职调查自动化[https://github.com/u3588064/AutoDDC] 
