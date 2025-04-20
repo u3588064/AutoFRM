@@ -1,0 +1,20 @@
+# Core Python Libraries likely needed for a multi-agent system with data analysis
+
+# For data manipulation and analysis
+pandas
+numpy
+
+# For making HTTP requests (e.g., to APIs for external data)
+requests
+
+# For potential machine learning / statistical modeling
+scikit-learn
+scipy
+
+# Add other specific libraries as needed, for example:
+# - Database connectors (psycopg2-binary, mysql-connector-python, etc.)
+# - Specific API client libraries (e.g., google-cloud-aiplatform, tweepy)
+# - Scheduling libraries (e.g., APScheduler)
+# - Web framework for UI (e.g., Flask, Django)
+# - Agent frameworks (e.g., langchain)
+pyautogen

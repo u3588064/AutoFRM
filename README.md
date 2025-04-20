@@ -1,50 +1,108 @@
-# RiskManagement_System
-风险管理开源系统。
-An open-source risk management system for small and medium-sized institutions that complies with regulations.
+# Risk Management Multi-Agent System (using Autogen)
 
+This project implements a Multi-Agent System for risk management using the [Microsoft Autogen](https://microsoft.github.io/autogen/) framework. It automates and enhances the risk management process through collaborative, specialized agents orchestrated via group chat.
 
-操作风险管理
-文书审核
+## System Overview
 
-A业务自动化[https://github.com/u3588064/AutoGuarantee]
+The system leverages Autogen to structure the risk management workflow:
 
-B业务自动化
+- **Orchestration:** A `GroupChatManager` agent, guided by a system prompt defining the workflow, orchestrates the interaction between specialist agents.
+- **User Interaction:** A `UserProxyAgent` represents the human Risk Manager, initiating tasks and reviewing results.
+- **Specialist Agents:** Each agent is responsible for a specific task in the risk management lifecycle:
+    - **InternalDataScannerAgent:** Monitors internal data sources for risk signals.
+    - **ExternalEnvironmentMonitorAgent:** Tracks external PESTLE factors.
+    - **MarketIndustryAnalystAgent:** Analyzes market and industry-specific risks.
+    - **QuantitativeRiskAssessorAgent:** Performs quantitative risk analysis (e.g., VaR, stress tests).
+    - **QualitativeRiskAssessorAgent:** Assesses qualitative risks using matrices or rules.
+    - **ResponseStrategyAgent:** Suggests risk response strategies (Avoid, Transfer, Mitigate, Accept) based on risk appetite.
+    - **MonitoringReportingAgent:** Sets up monitoring for risks/controls, runs checks, and generates reports.
 
-财务报表分析自动化[https://github.com/u3588064/AutoFSA]
+## Project Structure
 
-尽职调查自动化[https://github.com/u3588064/AutoDDC] 
+```
+risk_management_agents/
+├── agents/
+│   ├── __init__.py
+│   ├── internal_scanner.py
+│   ├── external_monitor.py
+│   ├── market_analyst.py
+│   ├── quantitative_assessor.py
+│   ├── qualitative_assessor.py
+│   ├── response_strategist.py
+│   └── monitoring_reporter.py
+│   # coordinator.py is intentionally blank (orchestration moved to main.py)
+├── coding/           # Working directory for code execution by agents
+├── data/             # Placeholder for data sources/storage
+├── models/           # Placeholder for risk models
+├── reports/          # Placeholder for generated reports
+├── main.py           # Main script to initialize agents and run the workflow
+├── requirements.txt  # Project dependencies
+├── OAI_CONFIG_LIST   # Example LLM configuration file (or use environment variable)
+└── README.md
+```
 
+## Getting Started
 
-## 项目评审
-- [x] 接收业务提交的材料并验证数据有效性、检查有无缺漏
-- [x] 收集外部信息（搜集基金公司AUM）
-- [ ] 从业务材料、内部系统、外部信息中整理结构化数据、总结摘要
-- [ ] 通过新的度量手段（社交媒体舆情等）评估风险
-- [ ] 融合多维度数据同时评估风险
-- [ ] 识别项目文档潜在风险
-- [ ] 评审报告初稿生成
+1.  **Clone the Repository:**
+    ```bash
+    git clone <repository_url>
+    cd risk_management_agents
+    ```
 
-## 政策制定
-### 规章制度
-- [ ] 解读上层制度，提取要点
-- [ ] 对比、总结修改前后的差异
-- [ ] 制度和指引的自动化撰写
-- [ ] 检查子公司制度与母公司制度的不一致性
-- [ ] 制度问答（Askbox）
+2.  **Set up Python Environment:** (Recommended)
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+    ```
 
-### 信贷政策
-- [ ] 用推理模型启发灵感（但模型给出的数字、阈值不可轻信）
-- [ ] 总结案例教训的共同特征
+3.  **Install Dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-## 业绩归因
-- [ ] 数据清洗
-- [ ] 因子确定
-  - [ ] 用推理模型启发灵感
-  - [ ] 从海量报告和新闻中提炼影响业务部门风险表现的因素
-- [ ] 结果分析
-- [ ] 更细颗粒度和更高频次的报告生成
+4.  **Configure LLM:**
+    -   You need access to an OpenAI API key (or compatible API).
+    -   Create a file named `OAI_CONFIG_LIST` (or `OAI_CONFIG_LIST.json`) in the `risk_management_agents` directory.
+    -   Add your API configuration to this file. Example:
+        ```json
+        [
+            {
+                "model": "gpt-4-turbo",
+                "api_key": "YOUR_API_KEY_HERE"
+            }
+        ]
+        ```
+    -   Replace `YOUR_API_KEY_HERE` with your actual key. Ensure the chosen model supports function calling (required for the `GroupChatManager`).
+    -   Alternatively, set the `OAI_CONFIG_LIST` environment variable with the JSON content.
 
-## 例行工作
-- [ ] 压力测试、计算VAR
-  - [x] RPA调度
-  - [ ] 发布报告
+5.  **Docker (Optional but Recommended):**
+    -   If you want agents (like the `QuantitativeRiskAssessorAgent`) to execute code in a sandboxed environment, install Docker and ensure it's running.
+    -   In `main.py`, set `use_docker: True` within the `code_execution_config` dictionary.
+
+## Usage
+
+1.  **Run the Main Script:**
+    ```bash
+    python main.py
+    ```
+
+2.  **Observe the Workflow:**
+    -   The script will initialize the agents and the group chat.
+    -   The `Risk_Manager` agent will initiate the "annual risk assessment" workflow.
+    -   The `Risk_Assessment_Manager` (GroupChatManager) will orchestrate the conversation, calling functions on the specialist agents according to the defined workflow.
+    -   You will see the messages exchanged between the agents and the results of their function calls (data scans, assessments, strategy suggestions, etc.).
+
+3.  **Interact (Optional):**
+    -   The `Risk_Manager` (UserProxyAgent) is configured with `human_input_mode="TERMINATE"`. If the conversation flow requires human input or clarification, it might prompt you.
+    -   You can type `TERMINATE` when prompted to end the chat gracefully.
+
+4.  **Review Results:**
+    -   The final risk assessment summary and response strategies will be presented in the chat output, addressed to the `Risk_Manager`.
+    -   The script includes commented-out sections for potentially extracting the final report from the chat history or running monitoring cycles separately.
+
+## Customization
+
+-   **Workflow:** Modify the `system_message` of the `GroupChatManager` in `main.py` to change the orchestration logic or workflow steps.
+-   **Agent Logic:** Update the internal methods (e.g., `_scan_financial_system`, `_calculate_var`) within each agent's Python file (`agents/*.py`) to implement real data connections, models, and analysis logic. Replace placeholder logic and dummy data.
+-   **Configuration:** Update the risk appetite, risk matrix, control library, and KRI definitions in `main.py` (or load them from external files/databases).
+-   **Models:** Change the LLM models used in the `llm_config` in `main.py`.
